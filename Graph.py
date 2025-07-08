@@ -1,9 +1,8 @@
-
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # Load the CSV file
-file_path = 'C:\\Users\\sharm\\OneDrive\\Desktop\\val\\3-4NTU\\3-4NTU.csv'
+file_path = 'C:\\Users\\sharm\\OneDrive\\Desktop\\val\\5-6NTU\\5-6NTU.csv'
 df = pd.read_csv(file_path)
 
 # Clean column names
@@ -12,7 +11,7 @@ df.columns = df.columns.str.strip()
 # Drop rows with missing values in required columns
 df = df.dropna(subset=['S No', 'Analog'])
 
-# Take only the first 800 rows
+# Take only the first 80 rows
 df = df.head(80)
 
 # Apply threshold: 1 if Analog > 0.49, else 0
@@ -31,6 +30,7 @@ plt.axhline(y=0.49, color='gray', linestyle='--', linewidth=1, label='Threshold 
 plt.title('Analog Voltage with Binary Classification (Threshold = 0.49)')
 plt.xlabel('Serial Number')
 plt.ylabel('Analog Voltage (V)')
+plt.ylim(0, 1)  # Fix Y-axis range from 0 to 1
 plt.grid(True)
 plt.legend()
 plt.tight_layout()
