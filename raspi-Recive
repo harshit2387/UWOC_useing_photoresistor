@@ -1,0 +1,43 @@
+import RPi.GPIO as GPIO
+import time
+
+# Set up GPIO pin for reception
+rx_pin = 24
+GPIO.setmode(GPIO.BCM)
+GPIO.setup(rx_pin, GPIO.IN)
+
+# Define bit timing for 115200 bps
+baud_rate = 115200
+bit_time = 1 / baud_rate
+
+def read_byte():
+    byte_val = 0
+    time.sleep(bit_time * 0.5)  # wait half bit time for first bit center
+    for i in range(8):
+        bit = GPIO.input(rx_pin)
+        byte_val |= (bit << i)
+        time.sleep(bit_time)
+    return byte_val
+
+def verify_checksum(data_byte, checksum):
+    return (0xFF - data_byte) == checksum
+
+try:
+    while True:
+        # Wait for start byte (0xAA)
+        while GPIO.input(rx_pin) != 1:
+            pass  # Idle wait
+
+        start = read_byte()
+        if start == 0xAA:
+            data = read_byte()
+            checksum = read_byte()
+            
+            if verify_checksum(data, checksum):
+                print(f"Received valid data: 0x{data:02X}")
+            else:
+                print("Checksum failed. Ignoring packet.")
+        else:
+            print("Invalid start byte received.")
+except KeyboardInterrupt:
+    GPIO.cleanup()
